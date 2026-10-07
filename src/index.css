@@ -818,6 +818,8 @@ textarea {
   max-height: calc(100dvh - env(safe-area-inset-top) - 24px);
   background: var(--bg);
   border-radius: 20px 20px 0 0;
+  /* don't inherit centering from the welcome screen */
+  text-align: left;
   animation: slide-up 0.25s ease;
 }
 
@@ -966,12 +968,11 @@ textarea {
 }
 
 .install-steps li > span:last-child {
-  display: flex;
-  flex-direction: column;
   line-height: 1.45;
 }
 
 .install-steps small {
+  display: block;
   font-size: 12px;
   color: var(--text-2);
 }
