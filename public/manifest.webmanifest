@@ -1,0 +1,9 @@
+{
+  "name": "Pour-over Dial-in",
+  "short_name": "Dial-in",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f1ea",
+  "theme_color": "#9a5b2f",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
