@@ -4,14 +4,6 @@ export type ScoreKey = (typeof SCORE_KEYS)[number]
 
 export type Scores = Record<ScoreKey, number | null>
 
-export const SCORE_LABELS: Record<ScoreKey, { th: string; en: string }> = {
-  sweetness: { th: 'หวาน', en: 'Sweetness' },
-  acidity: { th: 'เปรี้ยว', en: 'Acidity' },
-  aroma: { th: 'กลิ่น', en: 'Aroma' },
-  body: { th: 'บอดี้', en: 'Body' },
-  bitterness: { th: 'ขม', en: 'Bitterness' },
-}
-
 /** One coffee being dialed in: the things that stay the same across brews. */
 export interface Session {
   id: string

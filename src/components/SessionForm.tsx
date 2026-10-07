@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useI18n } from '../i18n'
 import type { Session, SessionInput } from '../types'
 import { numToStr, parseNum } from '../utils'
 import { Field } from './Fields'
@@ -14,6 +15,7 @@ interface Props {
 const unique = (values: string[]) => [...new Set(values.map((v) => v.trim()).filter(Boolean))]
 
 export function SessionForm({ id, initial, sessions, onSubmit }: Props) {
+  const { t } = useI18n()
   const [coffee, setCoffee] = useState(initial.coffee ?? '')
   const [dripper, setDripper] = useState(initial.dripper ?? '')
   const [grinder, setGrinder] = useState(initial.grinder ?? '')
@@ -33,33 +35,33 @@ export function SessionForm({ id, initial, sessions, onSubmit }: Props) {
   return (
     <form id={id} className="form-stack" onSubmit={submit}>
       <Field
-        label="กาแฟที่ใช้"
+        label={t.coffee}
         value={coffee}
         onChange={setCoffee}
-        placeholder="เช่น Ethiopia Guji Natural"
+        placeholder={t.coffeePlaceholder}
         required
         autoFocus={!initial.coffee}
       />
       <Field
-        label="ดริปเปอร์"
+        label={t.dripper}
         value={dripper}
         onChange={setDripper}
-        placeholder="เช่น V60 02"
+        placeholder={t.dripperPlaceholder}
         list="dl-drippers"
       />
       <Field
-        label="Grinder"
+        label={t.grinder}
         value={grinder}
         onChange={setGrinder}
-        placeholder="เช่น Comandante C40"
+        placeholder={t.grinderPlaceholder}
         list="dl-grinders"
       />
       <Field
-        label="TDS น้ำ"
+        label={t.waterTds}
         value={tds}
         onChange={setTds}
         inputMode="decimal"
-        placeholder="เช่น 80"
+        placeholder={t.tdsPlaceholder}
         suffix="ppm"
       />
       <datalist id="dl-drippers">

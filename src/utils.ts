@@ -28,15 +28,3 @@ export function normalizeTime(value: string): string {
   }
   return v
 }
-
-const dateFmt = new Intl.DateTimeFormat('th-TH', {
-  day: 'numeric',
-  month: 'short',
-  hour: '2-digit',
-  minute: '2-digit',
-})
-
-const dayFmt = new Intl.DateTimeFormat('th-TH', { day: 'numeric', month: 'short' })
-
-export const formatDateTime = (ts: number) => dateFmt.format(ts)
-export const formatDay = (ts: number) => dayFmt.format(ts)

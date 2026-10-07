@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n'
 import type { Platform } from '../install'
 import { AddSquareIcon, MoreIcon, ShareIcon } from './Icons'
 import { Modal } from './Modal'
@@ -9,24 +10,29 @@ interface Props {
   onClose: () => void
 }
 
+const b = (s: string) => <b>{s}</b>
+
 export function InstallPrompt({ platform, canPrompt, onInstall, onClose }: Props) {
+  const { t } = useI18n()
+  const i = t.install
+
   return (
     <Modal
-      title="เพิ่มลงหน้าโฮม"
+      title={i.title}
       onClose={onClose}
       footer={
         canPrompt ? (
           <div className="install-actions">
             <button type="button" className="btn ghost" onClick={onClose}>
-              ไว้ทีหลัง
+              {i.later}
             </button>
             <button type="button" className="btn primary" onClick={onInstall}>
-              ติดตั้ง
+              {i.install}
             </button>
           </div>
         ) : (
           <button type="button" className="btn primary block" onClick={onClose}>
-            เข้าใจแล้ว
+            {i.gotIt}
           </button>
         )
       }
@@ -35,8 +41,8 @@ export function InstallPrompt({ platform, canPrompt, onInstall, onClose }: Props
         <div className="install-hero">
           <img src="/icon-192.png" alt="" width={64} height={64} />
           <div>
-            <strong>Pour-over Dial-in</strong>
-            <p>เปิดจากหน้าโฮมได้ทันที เต็มจอเหมือนแอป ไม่ต้องพิมพ์ลิงก์</p>
+            <strong>{t.appName}</strong>
+            <p>{i.pitch}</p>
           </div>
         </div>
 
@@ -47,8 +53,8 @@ export function InstallPrompt({ platform, canPrompt, onInstall, onClose }: Props
                 <ShareIcon />
               </span>
               <span>
-                แตะปุ่ม <b>แชร์</b> ใน Safari
-                <small>ถ้าไม่เห็น ให้แตะ ⋯ ก่อน</small>
+                {i.iosShare(b)}
+                <small>{i.iosShareHint}</small>
               </span>
             </li>
             <li>
@@ -56,15 +62,13 @@ export function InstallPrompt({ platform, canPrompt, onInstall, onClose }: Props
                 <AddSquareIcon />
               </span>
               <span>
-                เลือก <b>เพิ่มไปยังหน้าจอโฮม</b>
-                <small>Add to Home Screen · อาจต้องเลื่อนลงไปหา</small>
+                {i.iosAdd(b)}
+                <small>{i.iosAddHint}</small>
               </span>
             </li>
             <li>
-              <span className="install-step-icon text">เพิ่ม</span>
-              <span>
-                แตะ <b>เพิ่ม</b> มุมขวาบน
-              </span>
+              <span className="install-step-icon text">{i.iosConfirmIcon}</span>
+              <span>{i.iosConfirm(b)}</span>
             </li>
           </ol>
         ) : (
@@ -73,17 +77,13 @@ export function InstallPrompt({ platform, canPrompt, onInstall, onClose }: Props
               <span className="install-step-icon">
                 <MoreIcon />
               </span>
-              <span>
-                แตะเมนู <b>⋮</b> ของเบราว์เซอร์
-              </span>
+              <span>{i.androidMenu(b)}</span>
             </li>
             <li>
               <span className="install-step-icon">
                 <AddSquareIcon />
               </span>
-              <span>
-                เลือก <b>ติดตั้งแอป</b> หรือ <b>เพิ่มลงในหน้าจอหลัก</b>
-              </span>
+              <span>{i.androidAdd(b)}</span>
             </li>
           </ol>
         )}

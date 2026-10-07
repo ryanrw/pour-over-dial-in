@@ -2,10 +2,12 @@ import { useMemo, useState } from 'react'
 import { DripForm } from './components/DripForm'
 import { DripperIcon, MenuIcon } from './components/Icons'
 import { InstallPrompt } from './components/InstallPrompt'
+import { LangSwitch } from './components/LangSwitch'
 import { Modal } from './components/Modal'
 import { SessionForm } from './components/SessionForm'
 import { SessionView } from './components/SessionView'
 import { Sidebar } from './components/Sidebar'
+import { useI18n } from './i18n'
 import { useInstall } from './install'
 import { isAppData, sortSessions, useAppData } from './store'
 import { emptyScores, type AppData, type Drip, type DripInput, type Session, type SessionInput } from './types'
@@ -44,6 +46,7 @@ function draftFrom(base: Drip | undefined, keepGrind: boolean): DripInput {
 }
 
 export default function App() {
+  const { t } = useI18n()
   const store = useAppData()
   const { data } = store
 
@@ -127,14 +130,14 @@ export default function App() {
 
   const deleteSession = () => {
     if (!current) return
-    if (confirm(`ลบ "${current.coffee}" และโน้ตทั้งหมด ${currentDrips.length} ครั้ง?`)) {
+    if (confirm(t.confirmDeleteCoffee(current.coffee, currentDrips.length))) {
       store.deleteSession(current.id)
       setSelectedId(null)
     }
   }
 
   const deleteDrip = (drip: Drip) => {
-    if (confirm('ลบโน้ตนี้?')) store.deleteDrip(drip.id)
+    if (confirm(t.confirmDeleteNote)) store.deleteDrip(drip.id)
   }
 
   // new sessions start with the gear from the last coffee; only the beans change
@@ -145,19 +148,22 @@ export default function App() {
   if (!current) {
     return (
       <main className="welcome">
+        <div className="welcome-lang">
+          <LangSwitch />
+        </div>
         <div className="welcome-mark">
           <DripperIcon width={40} height={40} strokeWidth={1.5} />
         </div>
-        <h1>Pour-over Dial-in</h1>
+        <h1>{t.appName}</h1>
         <p className="welcome-lede">
-          จดทุกครั้งที่ดริป แล้วปรับทีละตัวแปรจนได้แก้วที่ใช่
+          {t.tagline}
           <br />
-          เริ่มจากกาแฟที่กำลังจะชงตัวแรก
+          {t.welcomeStart}
         </p>
         <div className="card">
           <SessionForm id="welcome-session" initial={{}} sessions={[]} onSubmit={createSession} />
           <button type="submit" form="welcome-session" className="btn primary block">
-            เริ่ม dial-in
+            {t.startDialIn}
           </button>
         </div>
         <ImportLink onImport={store.replaceAll} />
@@ -172,7 +178,7 @@ export default function App() {
         type="button"
         className="fab-menu"
         onClick={() => setSidebarOpen(true)}
-        aria-label="รายการกาแฟ"
+        aria-label={t.coffees}
       >
         <MenuIcon />
       </button>
@@ -215,11 +221,11 @@ export default function App() {
 
       {sessionEditor && (
         <Modal
-          title={sessionEditor.mode === 'new' ? 'กาแฟตัวใหม่' : 'แก้ไขกาแฟ'}
+          title={sessionEditor.mode === 'new' ? t.newCoffee : t.editCoffee}
           onClose={() => setSessionEditor(null)}
           footer={
             <button type="submit" form="session-form" className="btn primary block">
-              {sessionEditor.mode === 'new' ? 'เริ่ม dial-in' : 'บันทึก'}
+              {sessionEditor.mode === 'new' ? t.startDialIn : t.save}
             </button>
           }
         >
@@ -240,11 +246,11 @@ export default function App() {
 
       {dripEditor && (
         <Modal
-          title={dripEditor.mode === 'new' ? 'New note' : 'แก้ไขโน้ต'}
+          title={dripEditor.mode === 'new' ? t.newNote : t.editNote}
           onClose={() => setDripEditor(null)}
           footer={
             <button type="submit" form="drip-form" className="btn primary block">
-              บันทึก
+              {t.save}
             </button>
           }
         >
@@ -264,6 +270,7 @@ export default function App() {
 }
 
 function ImportLink({ onImport }: { onImport: (data: AppData) => void }) {
+  const { t } = useI18n()
   const pick = () => {
     const input = document.createElement('input')
     input.type = 'file'
@@ -276,14 +283,14 @@ function ImportLink({ onImport }: { onImport: (data: AppData) => void }) {
         if (!isAppData(parsed)) throw new Error('invalid')
         onImport(parsed)
       } catch {
-        alert('ไฟล์ไม่ถูกต้อง')
+        alert(t.invalidFile)
       }
     }
     input.click()
   }
   return (
     <button type="button" className="link-btn welcome-import" onClick={pick}>
-      มีไฟล์สำรองอยู่แล้ว? นำเข้าข้อมูล
+      {t.haveBackup}
     </button>
   )
 }

@@ -1,5 +1,5 @@
-import { SCORE_KEYS, SCORE_LABELS, type Drip } from '../types'
-import { formatDateTime } from '../utils'
+import { useI18n } from '../i18n'
+import { SCORE_KEYS, type Drip } from '../types'
 import { CopyIcon, EditIcon, TrashIcon } from './Icons'
 
 interface Props {
@@ -19,19 +19,20 @@ interface Param {
   value: string
 }
 
-function params(d: Drip): Param[] {
+function params(d: Drip, label: ReturnType<typeof useI18n>['t']['chip']): Param[] {
   const list: Param[] = [
-    { key: 'dose', label: 'กาแฟ', value: d.dose != null ? `${d.dose}g` : '' },
-    { key: 'ratio', label: 'ratio', value: d.ratio != null ? `1:${d.ratio}` : '' },
-    { key: 'water', label: 'น้ำ', value: d.water != null ? `${d.water}g` : '' },
-    { key: 'grind', label: 'บด', value: d.grind },
-    { key: 'temp', label: 'temp', value: d.temp != null ? `${d.temp}°C` : '' },
-    { key: 'finishTime', label: 'เวลา', value: d.finishTime },
+    { key: 'dose', label: label.dose, value: d.dose != null ? `${d.dose}g` : '' },
+    { key: 'ratio', label: label.ratio, value: d.ratio != null ? `1:${d.ratio}` : '' },
+    { key: 'water', label: label.water, value: d.water != null ? `${d.water}g` : '' },
+    { key: 'grind', label: label.grind, value: d.grind },
+    { key: 'temp', label: label.temp, value: d.temp != null ? `${d.temp}°C` : '' },
+    { key: 'finishTime', label: label.time, value: d.finishTime },
   ]
   return list.filter((p) => p.value)
 }
 
 export function DripCard({ drip, index, previous, isLatest, onEdit, onUseAsBase, onDelete }: Props) {
+  const { t, formatDateTime } = useI18n()
   const hasScores = SCORE_KEYS.some((k) => drip.scores[k] != null)
   const recipeChanged = previous != null && previous.recipe !== drip.recipe
 
@@ -44,21 +45,27 @@ export function DripCard({ drip, index, previous, isLatest, onEdit, onUseAsBase,
         </div>
         <div className="drip-actions">
           {!isLatest && (
-            <button type="button" className="icon-btn sm" onClick={onUseAsBase} title="ใช้เป็นฐานของโน้ตใหม่">
+            <button
+              type="button"
+              className="icon-btn sm"
+              onClick={onUseAsBase}
+              title={t.useAsBase}
+              aria-label={t.useAsBase}
+            >
               <CopyIcon />
             </button>
           )}
-          <button type="button" className="icon-btn sm" onClick={onEdit} aria-label="แก้ไข">
+          <button type="button" className="icon-btn sm" onClick={onEdit} aria-label={t.edit}>
             <EditIcon />
           </button>
-          <button type="button" className="icon-btn sm danger" onClick={onDelete} aria-label="ลบ">
+          <button type="button" className="icon-btn sm danger" onClick={onDelete} aria-label={t.delete}>
             <TrashIcon />
           </button>
         </div>
       </header>
 
       <div className="chips">
-        {params(drip).map((p) => (
+        {params(drip, t.chip).map((p) => (
           <span
             key={p.key}
             className={`chip ${previous && previous[p.key] !== drip[p.key] ? 'changed' : ''}`}
@@ -80,7 +87,7 @@ export function DripCard({ drip, index, previous, isLatest, onEdit, onUseAsBase,
             return (
               <div key={k} className="score-tile">
                 <span className="score-value">{v ?? '–'}</span>
-                <span className="score-label">{SCORE_LABELS[k].th}</span>
+                <span className="score-label">{t.scoresShort[k]}</span>
                 <span className="score-bar">
                   <span style={{ width: `${((v ?? 0) / 4) * 100}%` }} />
                 </span>
@@ -88,21 +95,21 @@ export function DripCard({ drip, index, previous, isLatest, onEdit, onUseAsBase,
             )
           })}
           <div className={`score-tile dry ${drip.dry ? 'is-dry' : ''}`}>
-            <span className="score-value">{drip.dry ? 'Yes' : 'No'}</span>
-            <span className="score-label">Dry</span>
+            <span className="score-value">{drip.dry ? t.yes : t.no}</span>
+            <span className="score-label">{t.dry}</span>
           </div>
         </div>
       )}
 
       {drip.comment && (
         <div className="note">
-          <span className="note-label">Comment</span>
+          <span className="note-label">{t.comment}</span>
           <p>{drip.comment}</p>
         </div>
       )}
       {drip.adjustment && (
         <div className="note adjust">
-          <span className="note-label">แนวทางปรับ</span>
+          <span className="note-label">{t.adjustment}</span>
           <p>{drip.adjustment}</p>
         </div>
       )}

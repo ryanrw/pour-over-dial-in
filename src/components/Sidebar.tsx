@@ -1,8 +1,9 @@
 import { useRef, type ChangeEvent } from 'react'
 import { isAppData } from '../store'
 import type { AppData, Session } from '../types'
-import { formatDay } from '../utils'
+import { useI18n } from '../i18n'
 import { CloseIcon, DownloadIcon, DripperIcon, PhoneIcon, PlusIcon, UploadIcon } from './Icons'
+import { LangSwitch } from './LangSwitch'
 
 interface Props {
   open: boolean
@@ -30,6 +31,7 @@ export function Sidebar({
   onImport,
   onInstallApp,
 }: Props) {
+  const { t, formatDay } = useI18n()
   const fileRef = useRef<HTMLInputElement>(null)
 
   const exportData = () => {
@@ -49,30 +51,30 @@ export function Sidebar({
     try {
       const parsed: unknown = JSON.parse(await file.text())
       if (!isAppData(parsed)) throw new Error('invalid')
-      if (confirm(`นำเข้า ${parsed.sessions.length} กาแฟ / ${parsed.drips.length} โน้ต? ข้อมูลปัจจุบันจะถูกแทนที่`)) {
+      if (confirm(t.confirmImport(parsed.sessions.length, parsed.drips.length))) {
         onImport(parsed)
       }
     } catch {
-      alert('ไฟล์ไม่ถูกต้อง')
+      alert(t.invalidFile)
     }
   }
 
   return (
     <>
       <div className={`sidebar-backdrop ${open ? 'open' : ''}`} onClick={onClose} />
-      <aside className={`sidebar ${open ? 'open' : ''}`} aria-label="รายการกาแฟ">
+      <aside className={`sidebar ${open ? 'open' : ''}`} aria-label={t.coffees}>
         <div className="sidebar-header">
           <div className="brand">
             <DripperIcon width={22} height={22} />
             <span>Dial-in</span>
           </div>
-          <button type="button" className="icon-btn sidebar-close" onClick={onClose} aria-label="ปิด">
+          <button type="button" className="icon-btn sidebar-close" onClick={onClose} aria-label={t.close}>
             <CloseIcon />
           </button>
         </div>
 
         <button type="button" className="btn primary block" onClick={onNew}>
-          <PlusIcon /> กาแฟตัวใหม่
+          <PlusIcon /> {t.newCoffee}
         </button>
 
         <nav className="session-list">
@@ -88,7 +90,7 @@ export function Sidebar({
                 {[s.dripper, s.grinder].filter(Boolean).join(' · ') || '—'}
               </span>
               <span className="session-item-foot">
-                <span>{dripCounts.get(s.id) ?? 0} ครั้ง</span>
+                <span>{t.brews(dripCounts.get(s.id) ?? 0)}</span>
                 <span>{formatDay(s.createdAt)}</span>
               </span>
             </button>
@@ -98,10 +100,10 @@ export function Sidebar({
         <div className="sidebar-footer">
           {onInstallApp && (
             <button type="button" className="btn ghost sm block" onClick={onInstallApp}>
-              <PhoneIcon width={16} height={16} /> เพิ่มลงหน้าโฮม
+              <PhoneIcon width={16} height={16} /> {t.addToHome}
             </button>
           )}
-          <p>ข้อมูลเก็บไว้ในเครื่องนี้ · สำรองไว้เป็นไฟล์ได้</p>
+          <p>{t.storageNote}</p>
           <div className="sidebar-footer-actions">
             <button type="button" className="btn ghost sm" onClick={exportData}>
               <DownloadIcon width={16} height={16} /> Export
@@ -110,6 +112,7 @@ export function Sidebar({
               <UploadIcon width={16} height={16} /> Import
             </button>
           </div>
+          <LangSwitch />
           <input ref={fileRef} type="file" accept="application/json,.json" hidden onChange={importData} />
         </div>
       </aside>

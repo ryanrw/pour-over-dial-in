@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
+import { useI18n } from '../i18n'
 import { CloseIcon } from './Icons'
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function Modal({ title, onClose, children, footer }: Props) {
+  const { t } = useI18n()
   useEffect(() => {
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -31,7 +33,7 @@ export function Modal({ title, onClose, children, footer }: Props) {
       >
         <header className="modal-header">
           <h2>{title}</h2>
-          <button type="button" className="icon-btn" onClick={onClose} aria-label="ปิด">
+          <button type="button" className="icon-btn" onClick={onClose} aria-label={t.close}>
             <CloseIcon />
           </button>
         </header>

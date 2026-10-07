@@ -1,3 +1,4 @@
+import { useI18n } from '../i18n'
 import type { Drip, Session } from '../types'
 import { DripCard } from './DripCard'
 import { EditIcon, PlusIcon, TrashIcon } from './Icons'
@@ -22,10 +23,11 @@ export function SessionView({
   onEditDrip,
   onDeleteDrip,
 }: Props) {
+  const { t } = useI18n()
   const details = [
-    { label: 'ดริปเปอร์', value: session.dripper },
-    { label: 'Grinder', value: session.grinder },
-    { label: 'TDS น้ำ', value: session.waterTds != null ? `${session.waterTds} ppm` : '' },
+    { label: t.dripper, value: session.dripper },
+    { label: t.grinder, value: session.grinder },
+    { label: t.waterTds, value: session.waterTds != null ? `${session.waterTds} ppm` : '' },
   ]
 
   return (
@@ -34,10 +36,15 @@ export function SessionView({
         <div className="session-title-row">
           <h1>{session.coffee}</h1>
           <div className="session-actions">
-            <button type="button" className="icon-btn" onClick={onEditSession} aria-label="แก้ไขกาแฟ">
+            <button type="button" className="icon-btn" onClick={onEditSession} aria-label={t.editCoffee}>
               <EditIcon />
             </button>
-            <button type="button" className="icon-btn danger" onClick={onDeleteSession} aria-label="ลบกาแฟ">
+            <button
+              type="button"
+              className="icon-btn danger"
+              onClick={onDeleteSession}
+              aria-label={t.deleteCoffee}
+            >
               <TrashIcon />
             </button>
           </div>
@@ -56,7 +63,7 @@ export function SessionView({
         <span className="new-note-icon">
           <PlusIcon width={22} height={22} />
         </span>
-        New note
+        {t.newNote}
       </button>
 
       <div className="drip-list">
@@ -76,9 +83,7 @@ export function SessionView({
           .reverse()}
       </div>
 
-      {drips.length === 0 && (
-        <p className="empty-hint">ยังไม่มีโน้ต กด New note เพื่อจดการดริปครั้งแรก</p>
-      )}
+      {drips.length === 0 && <p className="empty-hint">{t.noNotes}</p>}
     </div>
   )
 }

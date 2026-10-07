@@ -1,4 +1,5 @@
 import type { InputHTMLAttributes, ReactNode } from 'react'
+import { useI18n } from '../i18n'
 
 interface FieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'prefix'> {
   label: string
@@ -52,6 +53,7 @@ interface SwitchProps {
 }
 
 export function Switch({ label, checked, onChange }: SwitchProps) {
+  const { t } = useI18n()
   return (
     <button
       type="button"
@@ -61,7 +63,7 @@ export function Switch({ label, checked, onChange }: SwitchProps) {
       onClick={() => onChange(!checked)}
     >
       <span className="switch-label">{label}</span>
-      <span className="switch-state">{checked ? 'Yes' : 'No'}</span>
+      <span className="switch-state">{checked ? t.yes : t.no}</span>
       <span className={`switch ${checked ? 'on' : ''}`}>
         <span className="switch-thumb" />
       </span>

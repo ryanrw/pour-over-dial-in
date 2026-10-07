@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import { SCORE_KEYS, SCORE_LABELS, type DripInput, type Scores } from '../types'
+import { useI18n } from '../i18n'
+import { SCORE_KEYS, type DripInput, type Scores } from '../types'
 import { normalizeTime, numToStr, parseNum, round1 } from '../utils'
 import { Field, ScoreInput, Switch, TextArea } from './Fields'
 
@@ -19,6 +20,7 @@ const calcWater = (dose: string, ratio: string): number | null => {
 }
 
 export function DripForm({ id, initial, grinder, previousAdjustment, onSubmit }: Props) {
+  const { t, en, lang } = useI18n()
   const [dose, setDose] = useState(numToStr(initial.dose))
   const [ratio, setRatio] = useState(numToStr(initial.ratio))
   const [water, setWater] = useState(numToStr(initial.water))
@@ -74,28 +76,28 @@ export function DripForm({ id, initial, grinder, previousAdjustment, onSubmit }:
     <form id={id} className="form-stack" onSubmit={submit}>
       {previousAdjustment && (
         <div className="reminder">
-          <span className="reminder-label">รอบที่แล้วบอกว่าจะปรับ</span>
+          <span className="reminder-label">{t.lastTimeAdjust}</span>
           <p>{previousAdjustment}</p>
         </div>
       )}
 
       <div className="form-grid">
         <Field
-          label="กาแฟ"
+          label={t.dose}
           value={dose}
           onChange={(v) => changeDoseOrRatio(v, ratio)}
           inputMode="decimal"
           suffix="g"
         />
         <Field
-          label="อัตราส่วน"
+          label={t.ratio}
           value={ratio}
           onChange={(v) => changeDoseOrRatio(dose, v)}
           inputMode="decimal"
           prefix="1 :"
         />
         <Field
-          label="น้ำ"
+          label={t.water}
           value={water}
           onChange={changeWater}
           inputMode="decimal"
@@ -103,27 +105,27 @@ export function DripForm({ id, initial, grinder, previousAdjustment, onSubmit }:
           hint={
             !waterAuto && computed != null && parseNum(water) !== computed ? (
               <button type="button" className="link-btn" onClick={resetWater}>
-                ใช้ {computed} g (กาแฟ × อัตราส่วน)
+                {t.useComputedWater(computed)}
               </button>
             ) : null
           }
         />
         <Field
-          label="เบอร์บด"
+          label={t.grind}
           value={grind}
           onChange={setGrind}
           inputMode="decimal"
           placeholder={grinder || undefined}
         />
         <Field
-          label="อุณหภูมิ"
+          label={t.temp}
           value={temp}
           onChange={setTemp}
           inputMode="decimal"
           suffix="°C"
         />
         <Field
-          label="เวลาจบ"
+          label={t.finishTime}
           value={finishTime}
           onChange={setFinishTime}
           onBlur={() => setFinishTime(normalizeTime(finishTime))}
@@ -133,34 +135,39 @@ export function DripForm({ id, initial, grinder, previousAdjustment, onSubmit }:
       </div>
 
       <TextArea
-        label="วิธีชง"
+        label={t.recipe}
         value={recipe}
         onChange={setRecipe}
-        placeholder="เช่น bloom 40g 45s, pour 3 รอบ ๆ ละ 70g"
+        placeholder={t.recipePlaceholder}
       />
 
       <section className="form-section">
-        <h3>ประเมินรอบนี้</h3>
+        <h3>{t.evaluation}</h3>
         <div className="score-list">
           {SCORE_KEYS.map((key) => (
             <ScoreInput
               key={key}
-              label={SCORE_LABELS[key].th}
-              sublabel={SCORE_LABELS[key].en}
+              label={t.scores[key]}
+              sublabel={lang === 'th' ? en.scores[key] : undefined}
               value={scores[key]}
               onChange={(v) => setScores((s) => ({ ...s, [key]: v }))}
             />
           ))}
-          <Switch label="Dry" checked={dry} onChange={setDry} />
+          <Switch label={t.dry} checked={dry} onChange={setDry} />
         </div>
       </section>
 
-      <TextArea label="Comment" value={comment} onChange={setComment} placeholder="รสชาติเป็นยังไง" />
       <TextArea
-        label="แนวทางปรับ"
+        label={t.comment}
+        value={comment}
+        onChange={setComment}
+        placeholder={t.commentPlaceholder}
+      />
+      <TextArea
+        label={t.adjustment}
         value={adjustment}
         onChange={setAdjustment}
-        placeholder="รอบหน้าจะลองเปลี่ยนอะไร"
+        placeholder={t.adjustmentPlaceholder}
       />
     </form>
   )
