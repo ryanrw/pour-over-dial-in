@@ -2,7 +2,7 @@ import { useRef, type ChangeEvent } from 'react'
 import { isAppData } from '../store'
 import type { AppData, Session } from '../types'
 import { formatDay } from '../utils'
-import { CloseIcon, DownloadIcon, DripperIcon, PlusIcon, UploadIcon } from './Icons'
+import { CloseIcon, DownloadIcon, DripperIcon, PhoneIcon, PlusIcon, UploadIcon } from './Icons'
 
 interface Props {
   open: boolean
@@ -14,6 +14,8 @@ interface Props {
   onNew: () => void
   onClose: () => void
   onImport: (data: AppData) => void
+  /** shown only when the app can be added to the home screen */
+  onInstallApp?: () => void
 }
 
 export function Sidebar({
@@ -26,6 +28,7 @@ export function Sidebar({
   onNew,
   onClose,
   onImport,
+  onInstallApp,
 }: Props) {
   const fileRef = useRef<HTMLInputElement>(null)
 
@@ -93,6 +96,11 @@ export function Sidebar({
         </nav>
 
         <div className="sidebar-footer">
+          {onInstallApp && (
+            <button type="button" className="btn ghost sm block" onClick={onInstallApp}>
+              <PhoneIcon width={16} height={16} /> เพิ่มลงหน้าโฮม
+            </button>
+          )}
           <p>ข้อมูลเก็บไว้ในเครื่องนี้ · สำรองไว้เป็นไฟล์ได้</p>
           <div className="sidebar-footer-actions">
             <button type="button" className="btn ghost sm" onClick={exportData}>

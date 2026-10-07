@@ -919,3 +919,81 @@ textarea {
 .welcome-import {
   margin-top: 4px;
 }
+
+/* ---------- install prompt ---------- */
+
+.install {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.install-hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.install-hero img {
+  flex-shrink: 0;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.install-hero p {
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--text-2);
+  line-height: 1.5;
+}
+
+.install-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 16px;
+  list-style: none;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.install-steps li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.install-steps li > span:last-child {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.45;
+}
+
+.install-steps small {
+  font-size: 12px;
+  color: var(--text-2);
+}
+
+.install-step-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.install-step-icon.text {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.install-actions {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+}

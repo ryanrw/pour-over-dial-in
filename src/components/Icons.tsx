@@ -78,3 +78,32 @@ export const ArrowIcon = (p: IconProps) => (
     <path d="M5 12h14M13 6l6 6-6 6" />
   </svg>
 )
+
+export const ShareIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <path d="M12 3v12M8 7l4-4 4 4" />
+    <path d="M8 11H6a1 1 0 00-1 1v8a1 1 0 001 1h12a1 1 0 001-1v-8a1 1 0 00-1-1h-2" />
+  </svg>
+)
+
+export const AddSquareIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="4" y="4" width="16" height="16" rx="3" />
+    <path d="M12 8v8M8 12h8" />
+  </svg>
+)
+
+export const MoreIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <circle cx="12" cy="5" r="1" />
+    <circle cx="12" cy="12" r="1" />
+    <circle cx="12" cy="19" r="1" />
+  </svg>
+)
+
+export const PhoneIcon = (p: IconProps) => (
+  <svg {...base(p)}>
+    <rect x="7" y="3" width="10" height="18" rx="2" />
+    <path d="M11 18h2" />
+  </svg>
+)

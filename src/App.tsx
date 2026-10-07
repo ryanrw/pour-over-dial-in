@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
 import { DripForm } from './components/DripForm'
 import { DripperIcon, MenuIcon } from './components/Icons'
+import { InstallPrompt } from './components/InstallPrompt'
 import { Modal } from './components/Modal'
 import { SessionForm } from './components/SessionForm'
 import { SessionView } from './components/SessionView'
 import { Sidebar } from './components/Sidebar'
+import { useInstall } from './install'
 import { isAppData, sortSessions, useAppData } from './store'
 import { emptyScores, type AppData, type Drip, type DripInput, type Session, type SessionInput } from './types'
 
@@ -53,6 +55,17 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sessionEditor, setSessionEditor] = useState<SessionEditor | null>(null)
   const [dripEditor, setDripEditor] = useState<DripEditor | null>(null)
+  const install = useInstall()
+
+  // never stack the install popup on top of a form
+  const installPrompt = install.open && !sessionEditor && !dripEditor && (
+    <InstallPrompt
+      platform={install.platform}
+      canPrompt={install.canPrompt}
+      onInstall={install.install}
+      onClose={install.dismiss}
+    />
+  )
 
   const dripCounts = useMemo(() => {
     const counts = new Map<string, number>()
@@ -148,6 +161,7 @@ export default function App() {
           </button>
         </div>
         <ImportLink onImport={store.replaceAll} />
+        {installPrompt}
       </main>
     )
   }
@@ -172,6 +186,14 @@ export default function App() {
         onSelect={selectSession}
         onNew={openNewSession}
         onClose={() => setSidebarOpen(false)}
+        onInstallApp={
+          install.available
+            ? () => {
+                setSidebarOpen(false)
+                install.show()
+              }
+            : undefined
+        }
         onImport={(next) => {
           store.replaceAll(next)
           setSelectedId(null)
@@ -235,6 +257,8 @@ export default function App() {
           />
         </Modal>
       )}
+
+      {installPrompt}
     </div>
   )
 }
