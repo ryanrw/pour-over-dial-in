@@ -30,12 +30,12 @@ export function SessionForm({ id, initial, sessions, onSubmit }: Props) {
   const [tds, setTds] = useState(numToStr(initial.waterTds))
   const [photo, setPhoto] = useState<Blob | null | undefined>(undefined)
 
-  // a name isn't needed when origin or farm already identify the coffee
-  const nameRequired = !origin.trim() && !farm.trim()
+  // the name is optional, but something has to identify the coffee
+  const nothingFilled = ![coffee, origin, farm, variety, process].some((v) => v.trim())
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    if (nameRequired && !coffee.trim()) return
+    if (nothingFilled) return
     onSubmit(
       {
         coffee: coffee.trim(),
@@ -59,13 +59,6 @@ export function SessionForm({ id, initial, sessions, onSubmit }: Props) {
     <form id={id} className="form-stack" onSubmit={submit}>
       <PhotoPicker storedId={initial.photoId ?? null} value={photo} onChange={setPhoto} />
 
-      <Field
-        label={t.coffeeName}
-        value={coffee}
-        onChange={setCoffee}
-        placeholder={t.coffeeNamePlaceholder}
-        required={nameRequired}
-      />
       <div className="form-grid">
         <Field
           label={t.origin}
@@ -73,6 +66,7 @@ export function SessionForm({ id, initial, sessions, onSubmit }: Props) {
           onChange={setOrigin}
           placeholder={t.originPlaceholder}
           list="dl-origins"
+          required={nothingFilled}
         />
         <Field label={t.farm} value={farm} onChange={setFarm} placeholder={t.farmPlaceholder} />
         <Field
@@ -90,6 +84,13 @@ export function SessionForm({ id, initial, sessions, onSubmit }: Props) {
           list="dl-processes"
         />
       </div>
+      <Field
+        label={t.coffeeName}
+        value={coffee}
+        onChange={setCoffee}
+        placeholder={t.coffeeNamePlaceholder}
+        hint={<span className="field-note">{t.coffeeNameHint}</span>}
+      />
 
       <section className="form-section">
         <h3>{t.setupSection}</h3>

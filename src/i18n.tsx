@@ -33,8 +33,9 @@ export const en = {
   delete: 'Delete',
   language: 'Language',
 
-  coffeeName: 'Name',
+  coffeeName: 'Other name · optional',
   coffeeNamePlaceholder: 'e.g. Akagera Red Bourbon',
+  coffeeNameHint: 'Leave empty to name it after origin and farm',
   origin: 'Origin',
   originPlaceholder: 'e.g. Rwanda',
   farm: 'Farm',
@@ -148,8 +149,9 @@ const th: Dict = {
   delete: 'ลบ',
   language: 'ภาษา',
 
-  coffeeName: 'ชื่อกาแฟ',
+  coffeeName: 'ชื่อเรียกอื่น · ไม่บังคับ',
   coffeeNamePlaceholder: 'เช่น Akagera Red Bourbon',
+  coffeeNameHint: 'ถ้าเว้นว่าง จะใช้แหล่งปลูกกับ Farm เป็นชื่อแทน',
   origin: 'แหล่งปลูก',
   originPlaceholder: 'เช่น Rwanda',
   farm: 'Farm',

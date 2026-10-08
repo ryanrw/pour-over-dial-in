@@ -1,7 +1,7 @@
 import { useRef, type ChangeEvent } from 'react'
 import { buildBackup, parseBackup, restoreBackup } from '../backup'
 import { usePhotoUrl } from '../photos'
-import { beanDetails, sessionTitle, type AppData, type Session } from '../types'
+import { sessionSubtitle, sessionTitle, type AppData, type Session } from '../types'
 import { useI18n } from '../i18n'
 import { CloseIcon, DownloadIcon, DripperIcon, PhoneIcon, PlusIcon, UploadIcon } from './Icons'
 import { LangSwitch } from './LangSwitch'
@@ -121,7 +121,7 @@ interface SessionItemProps {
 
 function SessionItem({ session, active, foot, onSelect }: SessionItemProps) {
   const photoUrl = usePhotoUrl(session.photoId)
-  const meta = beanDetails(session) || [session.dripper, session.grinder].filter(Boolean).join(' · ')
+  const meta = sessionSubtitle(session) || [session.dripper, session.grinder].filter(Boolean).join(' · ')
 
   return (
     <button type="button" className={`session-item ${active ? 'active' : ''}`} onClick={onSelect}>

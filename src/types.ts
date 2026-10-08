@@ -83,12 +83,18 @@ export function normalizeData(data: AppData): AppData {
   }
 }
 
-/** Name to show for a coffee: its own name, else origin + farm. */
+const beanParts = (s: Session) => [s.origin, s.farm, s.variety, s.process].filter(Boolean)
+
+/**
+ * Name to show for a coffee: its optional name, else the first two bean
+ * details that were filled in (usually origin + farm).
+ */
 export function sessionTitle(s: Session): string {
-  return s.coffee || [s.origin, s.farm].filter(Boolean).join(' ')
+  return s.coffee || beanParts(s).slice(0, 2).join(' ')
 }
 
-/** "Rwanda · West Akagera · Red Bourbon · Natural", skipping empty parts. */
-export function beanDetails(s: Session): string {
-  return [s.origin, s.farm, s.variety, s.process].filter(Boolean).join(' · ')
+/** Bean details not already shown in the title, e.g. "Red Bourbon · Natural". */
+export function sessionSubtitle(s: Session): string {
+  const parts = beanParts(s)
+  return (s.coffee ? parts : parts.slice(2)).join(' · ')
 }

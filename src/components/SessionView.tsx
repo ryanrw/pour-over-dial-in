@@ -1,7 +1,7 @@
 import { useI18n } from '../i18n'
 import { useState } from 'react'
 import { usePhotoUrl } from '../photos'
-import { beanDetails, sessionTitle, type Drip, type Session } from '../types'
+import { sessionSubtitle, sessionTitle, type Drip, type Session } from '../types'
 import { DripCard } from './DripCard'
 import { EditIcon, PlusIcon, TrashIcon } from './Icons'
 import { Modal } from './Modal'
@@ -29,10 +29,7 @@ export function SessionView({
   const { t } = useI18n()
   const photoUrl = usePhotoUrl(session.photoId)
   const [photoOpen, setPhotoOpen] = useState(false)
-  // without a name the title is already origin + farm, so don't repeat them
-  const beans = session.coffee
-    ? beanDetails(session)
-    : [session.variety, session.process].filter(Boolean).join(' · ')
+  const beans = sessionSubtitle(session)
   const details = [
     { label: t.dripper, value: session.dripper },
     { label: t.grinder, value: session.grinder },
