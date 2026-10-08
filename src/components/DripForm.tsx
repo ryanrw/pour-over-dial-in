@@ -7,7 +7,6 @@ import { Field, ScoreInput, Switch, TextArea } from './Fields'
 interface Props {
   id: string
   initial: DripInput
-  grinder: string
   /** "next time try..." note from the previous brew, shown as a reminder */
   previousAdjustment?: string
   onSubmit: (input: DripInput) => void
@@ -19,7 +18,7 @@ const calcWater = (dose: string, ratio: string): number | null => {
   return d != null && r != null ? round1(d * r) : null
 }
 
-export function DripForm({ id, initial, grinder, previousAdjustment, onSubmit }: Props) {
+export function DripForm({ id, initial, previousAdjustment, onSubmit }: Props) {
   const { t, en, lang } = useI18n()
   const [dose, setDose] = useState(numToStr(initial.dose))
   const [ratio, setRatio] = useState(numToStr(initial.ratio))
@@ -116,7 +115,6 @@ export function DripForm({ id, initial, grinder, previousAdjustment, onSubmit }:
           onChange={setGrind}
           inputMode="decimal"
           placeholder={t.grindPlaceholder}
-          hint={grinder ? <span className="field-note">{t.grindOn(grinder)}</span> : null}
         />
         <Field
           label={t.temp}

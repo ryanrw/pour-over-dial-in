@@ -270,7 +270,6 @@ export default function App() {
             id="drip-form"
             initial={dripEditor.mode === 'new' ? dripEditor.initial : dripEditor.drip}
             previousAdjustment={dripEditor.mode === 'new' ? dripEditor.previousAdjustment : undefined}
-            grinder={current.grinder}
             onSubmit={saveDrip}
           />
         </Modal>
