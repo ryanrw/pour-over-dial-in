@@ -773,26 +773,56 @@ textarea {
   color: var(--text-2);
 }
 
-.score-buttons {
+/* level bar: 5 joined segments that fill up to the score */
+.score-bar-input {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 6px;
+  gap: 3px;
 }
 
-.score-buttons button {
+/* each button is a full-height tap target; the visible segment is ::before */
+.score-bar-input button {
   height: 44px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface);
-  font-weight: 600;
-  font-size: 16px;
+  padding: 0;
+  border: 0;
+  background: none;
 }
 
-.score-buttons button.active {
+.score-bar-input button::before {
+  content: '';
+  display: block;
+  height: 14px;
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1px var(--border);
+  transition: background 0.15s;
+}
+
+.score-bar-input button:first-child::before {
+  border-radius: 7px 0 0 7px;
+}
+
+.score-bar-input button:last-child::before {
+  border-radius: 0 7px 7px 0;
+}
+
+.score-bar-input button.filled::before {
   background: var(--accent);
-  border-color: var(--accent);
-  color: var(--accent-ink);
+  box-shadow: none;
+}
+
+.score-input-value {
+  width: 20px;
+  flex-shrink: 0;
+  text-align: right;
+  font-weight: 700;
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.score-input-value.empty {
+  color: var(--text-2);
+  font-weight: 400;
 }
 
 .switch-row {

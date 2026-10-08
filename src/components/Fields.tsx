@@ -85,21 +85,21 @@ export function ScoreInput({ label, sublabel, value, onChange }: ScoreInputProps
         {label}
         {sublabel && <small>{sublabel}</small>}
       </div>
-      <div className="score-buttons">
+      <div className="score-bar-input">
         {[0, 1, 2, 3, 4].map((n) => (
           <button
             key={n}
             type="button"
             role="radio"
             aria-checked={value === n}
-            className={value === n ? 'active' : ''}
+            aria-label={String(n)}
+            className={value != null && n <= value ? 'filled' : ''}
             // tapping the selected value again clears it
             onClick={() => onChange(value === n ? null : n)}
-          >
-            {n}
-          </button>
+          />
         ))}
       </div>
+      <span className={`score-input-value ${value == null ? 'empty' : ''}`}>{value ?? '–'}</span>
     </div>
   )
 }
