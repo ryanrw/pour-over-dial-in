@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import type { AppData, Drip, DripInput, Session, SessionInput } from './types'
+import { prunePhotos } from './photos'
+import { normalizeData, type AppData, type Drip, type DripInput, type Session, type SessionInput } from './types'
 import { uid } from './utils'
 
 const STORAGE_KEY = 'pour-over-dial-in:v1'
@@ -17,7 +18,7 @@ function load(): AppData {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return emptyData()
     const parsed: unknown = JSON.parse(raw)
-    return isAppData(parsed) ? parsed : emptyData()
+    return isAppData(parsed) ? normalizeData(parsed) : emptyData()
   } catch {
     return emptyData()
   }
@@ -49,6 +50,11 @@ export function useAppData() {
   const [data, setData] = useState<AppData>(load)
 
   useEffect(() => save(data), [data])
+
+  const photoIds = data.sessions.map((s) => s.photoId).join(',')
+  useEffect(() => {
+    prunePhotos(new Set(photoIds.split(',').filter(Boolean))).catch(() => {})
+  }, [photoIds])
 
   const addSession = useCallback((input: SessionInput): Session => {
     const session: Session = { ...input, id: uid(), createdAt: Date.now() }
@@ -87,7 +93,7 @@ export function useAppData() {
     setData((d) => ({ ...d, drips: d.drips.filter((dr) => dr.id !== id) }))
   }, [])
 
-  const replaceAll = useCallback((next: AppData) => setData(next), [])
+  const replaceAll = useCallback((next: AppData) => setData(normalizeData(next)), [])
 
   return {
     data,

@@ -9,8 +9,11 @@ import { SessionView } from './components/SessionView'
 import { Sidebar } from './components/Sidebar'
 import { useI18n } from './i18n'
 import { useInstall } from './install'
-import { isAppData, sortSessions, useAppData } from './store'
-import { emptyScores, type AppData, type Drip, type DripInput, type Session, type SessionInput } from './types'
+import { parseBackup, restoreBackup } from './backup'
+import { putPhoto } from './photos'
+import { sortSessions, useAppData } from './store'
+import { emptyScores, type AppData, type Drip, type DripInput, type Session, type SessionInput, sessionTitle } from './types'
+import { uid } from './utils'
 
 type SessionEditor = { mode: 'new' } | { mode: 'edit'; session: Session }
 type DripEditor = { mode: 'new'; initial: DripInput; previousAdjustment?: string } | { mode: 'edit'; drip: Drip }
@@ -95,9 +98,22 @@ export default function App() {
     setSessionEditor({ mode: 'new' })
   }
 
-  const createSession = (input: SessionInput) => {
-    const session = store.addSession(input)
-    setSelectedId(session.id)
+  const saveSession = async (input: SessionInput, photo: Blob | null | undefined, existing?: Session) => {
+    if (photo) {
+      const photoId = uid()
+      try {
+        await putPhoto(photoId, photo)
+        input = { ...input, photoId }
+      } catch {
+        alert(t.photoFailed)
+        return
+      }
+    } else if (photo === null) {
+      input = { ...input, photoId: null }
+    }
+    // the replaced photo is cleaned up by the store once nothing points to it
+    if (existing) store.updateSession(existing.id, input)
+    else setSelectedId(store.addSession(input).id)
     setSessionEditor(null)
   }
 
@@ -130,7 +146,7 @@ export default function App() {
 
   const deleteSession = () => {
     if (!current) return
-    if (confirm(t.confirmDeleteCoffee(current.coffee, currentDrips.length))) {
+    if (confirm(t.confirmDeleteCoffee(sessionTitle(current), currentDrips.length))) {
       store.deleteSession(current.id)
       setSelectedId(null)
     }
@@ -161,7 +177,7 @@ export default function App() {
           {t.welcomeStart}
         </p>
         <div className="card">
-          <SessionForm id="welcome-session" initial={{}} sessions={[]} onSubmit={createSession} />
+          <SessionForm id="welcome-session" initial={{}} sessions={[]} onSubmit={(i, p) => saveSession(i, p)} />
           <button type="submit" form="welcome-session" className="btn primary block">
             {t.startDialIn}
           </button>
@@ -233,13 +249,9 @@ export default function App() {
             id="session-form"
             initial={sessionEditor.mode === 'new' ? newSessionInitial : sessionEditor.session}
             sessions={data.sessions}
-            onSubmit={(input) => {
-              if (sessionEditor.mode === 'new') createSession(input)
-              else {
-                store.updateSession(sessionEditor.session.id, input)
-                setSessionEditor(null)
-              }
-            }}
+            onSubmit={(input, photo) =>
+              saveSession(input, photo, sessionEditor.mode === 'edit' ? sessionEditor.session : undefined)
+            }
           />
         </Modal>
       )}
@@ -278,13 +290,12 @@ function ImportLink({ onImport }: { onImport: (data: AppData) => void }) {
     input.onchange = async () => {
       const file = input.files?.[0]
       if (!file) return
-      try {
-        const parsed: unknown = JSON.parse(await file.text())
-        if (!isAppData(parsed)) throw new Error('invalid')
-        onImport(parsed)
-      } catch {
+      const backup = parseBackup(await file.text())
+      if (!backup) {
         alert(t.invalidFile)
+        return
       }
+      onImport(await restoreBackup(backup))
     }
     input.click()
   }

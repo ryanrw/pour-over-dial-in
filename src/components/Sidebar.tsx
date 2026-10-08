@@ -1,6 +1,7 @@
 import { useRef, type ChangeEvent } from 'react'
-import { isAppData } from '../store'
-import type { AppData, Session } from '../types'
+import { buildBackup, parseBackup, restoreBackup } from '../backup'
+import { usePhotoUrl } from '../photos'
+import { beanDetails, sessionTitle, type AppData, type Session } from '../types'
 import { useI18n } from '../i18n'
 import { CloseIcon, DownloadIcon, DripperIcon, PhoneIcon, PlusIcon, UploadIcon } from './Icons'
 import { LangSwitch } from './LangSwitch'
@@ -34,8 +35,8 @@ export function Sidebar({
   const { t, formatDay } = useI18n()
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const exportData = () => {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+  const exportData = async () => {
+    const blob = new Blob([await buildBackup(data)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
@@ -48,14 +49,13 @@ export function Sidebar({
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
-    try {
-      const parsed: unknown = JSON.parse(await file.text())
-      if (!isAppData(parsed)) throw new Error('invalid')
-      if (confirm(t.confirmImport(parsed.sessions.length, parsed.drips.length))) {
-        onImport(parsed)
-      }
-    } catch {
+    const backup = parseBackup(await file.text())
+    if (!backup) {
       alert(t.invalidFile)
+      return
+    }
+    if (confirm(t.confirmImport(backup.sessions.length, backup.drips.length))) {
+      onImport(await restoreBackup(backup))
     }
   }
 
@@ -79,21 +79,13 @@ export function Sidebar({
 
         <nav className="session-list">
           {sessions.map((s) => (
-            <button
+            <SessionItem
               key={s.id}
-              type="button"
-              className={`session-item ${s.id === currentId ? 'active' : ''}`}
-              onClick={() => onSelect(s.id)}
-            >
-              <span className="session-item-title">{s.coffee}</span>
-              <span className="session-item-meta">
-                {[s.dripper, s.grinder].filter(Boolean).join(' · ') || '—'}
-              </span>
-              <span className="session-item-foot">
-                <span>{t.brews(dripCounts.get(s.id) ?? 0)}</span>
-                <span>{formatDay(s.createdAt)}</span>
-              </span>
-            </button>
+              session={s}
+              active={s.id === currentId}
+              foot={[t.brews(dripCounts.get(s.id) ?? 0), formatDay(s.createdAt)]}
+              onSelect={() => onSelect(s.id)}
+            />
           ))}
         </nav>
 
@@ -117,5 +109,31 @@ export function Sidebar({
         </div>
       </aside>
     </>
+  )
+}
+
+interface SessionItemProps {
+  session: Session
+  active: boolean
+  foot: [string, string]
+  onSelect: () => void
+}
+
+function SessionItem({ session, active, foot, onSelect }: SessionItemProps) {
+  const photoUrl = usePhotoUrl(session.photoId)
+  const meta = beanDetails(session) || [session.dripper, session.grinder].filter(Boolean).join(' · ')
+
+  return (
+    <button type="button" className={`session-item ${active ? 'active' : ''}`} onClick={onSelect}>
+      {photoUrl && <img className="session-item-photo" src={photoUrl} alt="" />}
+      <span className="session-item-text">
+        <span className="session-item-title">{sessionTitle(session)}</span>
+        <span className="session-item-meta">{meta || '—'}</span>
+        <span className="session-item-foot">
+          <span>{foot[0]}</span>
+          <span>{foot[1]}</span>
+        </span>
+      </span>
+    </button>
   )
 }

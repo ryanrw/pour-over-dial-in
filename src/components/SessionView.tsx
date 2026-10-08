@@ -1,7 +1,10 @@
 import { useI18n } from '../i18n'
-import type { Drip, Session } from '../types'
+import { useState } from 'react'
+import { usePhotoUrl } from '../photos'
+import { beanDetails, sessionTitle, type Drip, type Session } from '../types'
 import { DripCard } from './DripCard'
 import { EditIcon, PlusIcon, TrashIcon } from './Icons'
+import { Modal } from './Modal'
 
 interface Props {
   session: Session
@@ -24,6 +27,12 @@ export function SessionView({
   onDeleteDrip,
 }: Props) {
   const { t } = useI18n()
+  const photoUrl = usePhotoUrl(session.photoId)
+  const [photoOpen, setPhotoOpen] = useState(false)
+  // without a name the title is already origin + farm, so don't repeat them
+  const beans = session.coffee
+    ? beanDetails(session)
+    : [session.variety, session.process].filter(Boolean).join(' · ')
   const details = [
     { label: t.dripper, value: session.dripper },
     { label: t.grinder, value: session.grinder },
@@ -34,7 +43,15 @@ export function SessionView({
     <div className="session-view">
       <header className="session-header">
         <div className="session-title-row">
-          <h1>{session.coffee}</h1>
+          {photoUrl && (
+            <button type="button" className="session-photo" onClick={() => setPhotoOpen(true)}>
+              <img src={photoUrl} alt="" />
+            </button>
+          )}
+          <div className="session-title">
+            <h1>{sessionTitle(session)}</h1>
+            {beans && <p className="session-beans">{beans}</p>}
+          </div>
           <div className="session-actions">
             <button type="button" className="icon-btn" onClick={onEditSession} aria-label={t.editCoffee}>
               <EditIcon />
@@ -84,6 +101,12 @@ export function SessionView({
       </div>
 
       {drips.length === 0 && <p className="empty-hint">{t.noNotes}</p>}
+
+      {photoOpen && photoUrl && (
+        <Modal title={sessionTitle(session)} onClose={() => setPhotoOpen(false)}>
+          <img className="photo-full" src={photoUrl} alt="" />
+        </Modal>
+      )}
     </div>
   )
 }

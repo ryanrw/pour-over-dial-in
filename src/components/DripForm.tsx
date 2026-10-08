@@ -115,7 +115,8 @@ export function DripForm({ id, initial, grinder, previousAdjustment, onSubmit }:
           value={grind}
           onChange={setGrind}
           inputMode="decimal"
-          placeholder={grinder || undefined}
+          placeholder={t.grindPlaceholder}
+          hint={grinder ? <span className="field-note">{t.grindOn(grinder)}</span> : null}
         />
         <Field
           label={t.temp}
